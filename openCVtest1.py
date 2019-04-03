@@ -1,9 +1,14 @@
+
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
+import os
+dirname = os.path.dirname(__file__)
 
-img = cv2.imread(r'C:\Users\sepsi\Desktop\Python\CompVision\medinfo\images\lena.jpg')
+img_path = os.path.join(dirname, 'images/lena.jpg')
+
+img = cv2.imread(img_path)
 color = ('b', 'g', 'r')
 
 # inverting colors by deducting color code from 255
