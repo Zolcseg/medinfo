@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-img = cv2.imread(r'C:\Users\sepsi\OneDrive\Pictures\lena.jpg')
+img = cv2.imread(r'C:\Users\sepsi\Desktop\Python\CompVision\medinfo\images\lena.jpg')
 color = ('b', 'g', 'r')
 
 # inverting colors by deducting color code from 255
