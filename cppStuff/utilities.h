@@ -1,9 +1,3 @@
-/**
- * @function calcHist_Demo.cpp
- * @brief Demo code to use the function calcHist
- * @author
- */
-
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/imgproc.hpp"
@@ -12,29 +6,61 @@
 using namespace std;
 using namespace cv;
 
-/**
- * @function main
- */
-
-cv::Mat invert_img(cv::Mat const& input)
+Mat invert_img(Mat const& input)
 {
 	return cv::Scalar::all(255) - input;
 }
 
-int main(int argc, char** argv)
-{
-	//! [Load image]
-	CommandLineParser parser(argc, argv, "{@input | ../data/lena.jpg | input image}");
-	Mat src = imread(parser.get<String>("@input"), IMREAD_COLOR);
-	if (src.empty())
-	{
-		return -1;
+Mat extended_hist_image(Mat image_src) {
+
+	Mat grey;
+	cvtColor(image_src, grey, cv::COLOR_RGB2GRAY);
+	imshow("stuff", grey);
+
+	//! [Establish the number of bins]
+	int histSize = 256;
+	//! [Establish the number of bins]
+
+	float range[] = { 0, 256 }; //the upper boundary is exclusive
+	const float* histRange = { range };
+
+	//! [Set histogram param]
+	bool uniform = true, accumulate = false;
+	//! [Set histogram param]
+
+	Mat hist;
+	calcHist(&grey, 1, 0, Mat(), hist, 1, &histSize, &histRange, uniform, accumulate);
+
+	uint min = 0;
+	for (int i = 0; i < 256; i++) {
+		if (hist.at<int>(i) != 0) { min = i; break; }
 	}
-	//! [Load image]
+	uint max = 255;
+	for (int i = 255; i > 0; i--) {
+		if (hist.at<int>(i) != 255) { max = i; break; }
+	}
+
+	Mat grey_extended;
+	grey.copyTo(grey_extended);
+	int rows = grey_extended.rows;
+	int cols = grey_extended.cols;
+	for (int x = 0; x < cols; x++) {
+		for (int y = 0; y < rows; y++) {
+			uint in = grey_extended.at<uchar>(y, x);
+			float result = (in - min) * 255 / (max - min);
+			grey_extended.at<uchar>(y, x) = (uint)result;
+		}
+	}
+
+	return grey_extended;
+}
+
+
+Mat create_histogram(Mat image_src) {
 
 	//! [Separate the image in 3 places ( B, G and R )]
 	vector<Mat> bgr_planes;
-	split(src, bgr_planes);
+	split(image_src, bgr_planes);
 	//! [Separate the image in 3 places ( B, G and R )]
 
 	//! [Establish the number of bins]
@@ -83,43 +109,7 @@ int main(int argc, char** argv)
 			Point(bin_w*(i), hist_h - cvRound(r_hist.at<float>(i))),
 			Scalar(0, 0, 255), 2, 8, 0);
 	}
-	//! [Draw for each channel]
 
-	// pixel szintu manipulacio
-	Mat img;
-	src.copyTo(img);
-	cv::MatIterator_<cv::Vec3b> it, end;
-	for (it = img.begin<cv::Vec3b>(), end = img.end<cv::Vec3b>(); it != end; ++it) {
-		uchar &r = (*it)[2];
-		uchar &g = (*it)[1];
-		uchar &b = (*it)[0];
-		// Modify r, g, b values
-		r = 255 - r;
-		g = 255 - g;
-		b = 255 - b;
-	}
-
-	//! [Display]
-	Mat bitwise;
-	Mat grey;
-
-	cvtColor(src, grey, cv::COLOR_RGB2GRAY);
-
-	Mat dst;
-	equalizeHist(grey, dst);
-
-	bitwise_not(src, bitwise);
-
-	imshow("Source image", src);
-	imshow("Inverted image", invert_img(src));
-	imshow("bitwise inverted", bitwise);
-	imshow("coverted grayscale", grey);
-
-	imshow("calcHist Demo", histImage);
-	imshow("calcHist Equalized", dst);
-
-	waitKey();
-	//! [Display]
-
-	return 0;
+	return histImage;
 }
+
