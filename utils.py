@@ -69,15 +69,8 @@ def extended_hist_img_and_img(cvimg):
             histmax = i
             break
 
-    # for x in xrange(cust_grey.shape[0]):
-    #     for y in xrange(cust_grey.shape[1]):
-    #         intensity = cust_grey[x, y]
-    #         result = (intensity - histmin) * 255.0 / (histmax - histmin)
-    #         cust_grey[x,y] = np.int32(np.around(result))
-
     tmp_grey = (g_img - histmin) * 255.0 / (histmax - histmin)
     cust_grey = np.uint8(np.around(tmp_grey))
-
 
     bins = np.arange(width).reshape(width,1)
     color = [(255,0,0)]
