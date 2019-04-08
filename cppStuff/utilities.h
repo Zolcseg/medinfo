@@ -113,3 +113,46 @@ Mat create_histogram(Mat image_src) {
 	return histImage;
 }
 
+Mat create_grey_histogram(Mat image_src) {
+
+	//! [Establish the number of bins]
+	int histSize = 256;
+	//! [Establish the number of bins]
+
+	//! [Set the ranges ( for B,G,R) )]
+	float range[] = { 0, 256 }; //the upper boundary is exclusive
+	const float* histRange = { range };
+	//! [Set the ranges ( for B,G,R) )]
+
+	//! [Set histogram param]
+	bool uniform = true, accumulate = false;
+	//! [Set histogram param]
+
+	//! [Compute the histograms]
+	Mat  g_hist;
+	calcHist(&image_src, 1, 0, Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate);
+
+	//! [Compute the histograms]
+
+	//! [Draw the histograms for B, G and R]
+	int hist_w = 512, hist_h = 400;
+	int bin_w = cvRound((double)hist_w / histSize);
+
+	Mat histImage(hist_h, hist_w, CV_8UC1, Scalar(0, 0, 0));
+
+	//! [Normalize the result to ( 0, histImage.rows )]
+	normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat());
+
+	//! [Normalize the result to ( 0, histImage.rows )]
+
+	//! [Draw for each channel]
+	for (int i = 1; i < histSize; i++)
+	{
+		line(histImage, Point(bin_w*(i - 1), hist_h - cvRound(g_hist.at<float>(i - 1))),
+			Point(bin_w*(i), hist_h - cvRound(g_hist.at<float>(i))),
+			Scalar(255, 0, 0), 2, 8, 0);
+	}
+
+	return histImage;
+}
+

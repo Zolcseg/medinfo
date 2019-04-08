@@ -55,13 +55,15 @@ int main(int argc, char** argv)
 	bitwise_not(src, bitwise);
 
 	imshow("Source image", src);
-	imshow("bitwise inverted", bitwise);
+	//imshow("bitwise inverted", bitwise);
 	imshow("coverted grayscale", grey);
 	imshow("Extended grayscale img", extended_hist_image(src));
 	imshow("Equalized grayscale img", dst);
 
-	imshow("calcHist headerbol", create_histogram(src));
-
+	imshow("histo eredeti", create_histogram(src));
+	imshow("histo grayscale", create_grey_histogram(grey));
+	imshow("histo extended grayscale", create_grey_histogram(extended_hist_image(src)));
+	imshow("histo equalized grayscale", create_grey_histogram(dst));
 
 	waitKey();
 	//! [Display]
