@@ -85,3 +85,24 @@ def linear_stretch_hist_img_and_img(cvimg):
     custom_h_image=np.flipud(h)
 
     return custom_h_image, cust_grey
+
+def convolve(grey_img,kernel):
+
+    (iH, iW) = grey_img.shape[:2]
+    (kH, kW) = kernel.shape[:2]
+    pad = (kW - 1) // 2
+
+    # below can be used if we want to keep padded image
+    # image = cv2.copyMakeBorder(cv_img, pad, pad, pad, pad,cv2.BORDER_REPLICATE)
+
+    output = np.zeros((iH, iW), dtype=grey_img.dtype)
+
+    # inverting colors by scanning through pixels
+    for x in xrange(pad, iH - pad):
+        for y in xrange(pad, iW - pad):
+            roi = grey_img[x - pad:x + pad + 1, y - pad:y + pad + 1]
+            k = (roi * kernel).sum()
+            k_rescale = np.uint8(np.around(k))
+            output[x, y] = k_rescale
+
+    return output
