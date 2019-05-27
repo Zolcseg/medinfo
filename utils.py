@@ -51,7 +51,7 @@ def convert2grey(cvimg):
 def equalize_hist_img(cvimg):
     return cv2.equalizeHist(convert2grey(cvimg))
 
-def extended_hist_img_and_img(cvimg):
+def linear_stretch_hist_img_and_img(cvimg):
 
     g_img = convert2grey(cvimg)
     width = 256
