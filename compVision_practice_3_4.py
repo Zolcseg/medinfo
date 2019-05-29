@@ -8,6 +8,16 @@ from datetime import datetime
 
 dirname = os.path.dirname(__file__)
 
+
+def calcBlurriness(grey_img):
+    Gx = cv2.Sobel(grey_img, cv2.CV_32F, 1, 0)
+    Gy = cv2.Sobel(grey_img, cv2.CV_32F, 0, 1)
+    normGx = cv2.norm(Gx)
+    normGy = cv2.norm(Gy)
+    sumSq = normGx * normGx + normGy * normGy
+    return (1.0 / (sumSq / grey_img.size)) * 10000
+
+
 if __name__ == "__main__":
 
     # setting default picture name to use
@@ -39,7 +49,10 @@ if __name__ == "__main__":
 
     cv2.imshow('original img', cv_img)
 
+
     grey_img = u.convert2grey(cv_img)
+    print('Blurriness (with double sobel): ' + str(calcBlurriness(grey_img)))
+    print('Blurriness (with Laplacian variance): ' +str(cv2.Laplacian(grey_img, cv2.CV_64F).var()))
     output = grey_img
     kernel = kernels.get_kernel(kernel_name)
 
@@ -54,10 +67,16 @@ if __name__ == "__main__":
         pr_time1 = str(float(t.seconds + t.microseconds / 1000000.0)) + 'sec '
         cv2.imshow('#' + str(x) + ' ' + pr_time1 + ' - convoluted img', output)
         #cv2.imshow('#' + str(x) + ' ' + pr_time1 + ' - convoluted img 2', output1)
+        print('Blurriness (with double sobel): ' + str(calcBlurriness(output)))
+        print('Blurriness (with Laplacian variance): ' + str(cv2.Laplacian(output, cv2.CV_64F).var()))
 
+    output = u.convolve(output,kernels.get_kernel("sharpen"))
+    cv2.imshow('sharpened - convoluted img', output)
+    print('1 step sharpened blurriness: ' + str(calcBlurriness(output)))
+    print('Blurriness (with Laplacian variance): ' + str(cv2.Laplacian(output, cv2.CV_64F).var()))
     cv2.waitKey(0)
 
     cv2.destroyAllWindows()
 
-    print(str(cv2.Laplacian(output,cv2.CV_64F).var()))
-    print(str(cv2.Laplacian(grey_img,cv2.CV_64F).var()))
+    #print(str(cv2.Laplacian(output,cv2.CV_64F).var()))
+    #print(str(cv2.Laplacian(grey_img,cv2.CV_64F).var()))

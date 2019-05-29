@@ -10,7 +10,7 @@ def create_histogram_image(cvimg):
     color = [(255,0,0),(0,255,0),(0,0,255)]
 
     for ch, col in enumerate(color):
-        hist_item = cv2.calcHist([cvimg], [ch], None, [width], [0, 255])
+        hist_item = cv2.calcHist([cvimg], [ch], None, [width], [0, 256])
         cv2.normalize(hist_item, hist_item, 0, 255, cv2.NORM_MINMAX)
         hist = np.int32(np.around(hist_item))
         pts = np.column_stack((bins, hist))
@@ -29,7 +29,7 @@ def create_grey_histogram_image(cvimg):
     color = [(255,0,0)]
 
     for ch, col in enumerate(color):
-        hist_item = cv2.calcHist([cvimg], [ch], None, [width], [0, 255])
+        hist_item = cv2.calcHist([cvimg], [ch], None, [width], [0, 256])
         cv2.normalize(hist_item, hist_item, 0, 255, cv2.NORM_MINMAX)
         hist = np.int32(np.around(hist_item))
         pts = np.column_stack((bins, hist))
@@ -55,7 +55,7 @@ def linear_stretch_hist_img_and_img(cvimg):
 
     g_img = convert2grey(cvimg)
     width = 256
-    grey_histo = cv2.calcHist([g_img], [0], None, [width], [0, 255])
+    grey_histo = cv2.calcHist([g_img], [0], None, [width], [0, 256])
 
     histmin = 0
     for i in range(0,255):
@@ -76,7 +76,7 @@ def linear_stretch_hist_img_and_img(cvimg):
     color = [(255,0,0)]
     h = np.zeros((cust_grey.shape[0], width, 1), dtype=cust_grey.dtype)
     for ch, col in enumerate(color):
-        hist_item = cv2.calcHist([cust_grey], [ch], None, [width], [0, 255])
+        hist_item = cv2.calcHist([cust_grey], [ch], None, [width], [0, 256])
         cv2.normalize(hist_item, hist_item, 0, 255, cv2.NORM_MINMAX)
         hist = np.int32(np.around(hist_item))
         pts = np.column_stack((bins, hist))
@@ -95,14 +95,18 @@ def convolve(grey_img,kernel):
     # below can be used if we want to keep padded image
     # image = cv2.copyMakeBorder(cv_img, pad, pad, pad, pad,cv2.BORDER_REPLICATE)
 
-    output = np.zeros((iH, iW), dtype=grey_img.dtype)
+    output = np.zeros((iH, iW), dtype='float32')
 
     # inverting colors by scanning through pixels
     for x in xrange(pad, iH - pad):
         for y in xrange(pad, iW - pad):
             roi = grey_img[x - pad:x + pad + 1, y - pad:y + pad + 1]
             k = (roi * kernel).sum()
-            k_rescale = np.uint8(np.around(k))
-            output[x, y] = k_rescale
+            output[x, y] = k
+
+    #maxout = output.max()
+    #minout = output.min()
+    #output = (output - minout) * 255.0 / (maxout - minout)
+    output = np.uint8(np.around(output))
 
     return output
